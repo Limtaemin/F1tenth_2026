@@ -154,9 +154,9 @@ void VescToOdom::vescStateCallback(const VescStateStamped::SharedPtr state)
 
   // Position uncertainty
   /** @todo Think about position uncertainty, perhaps get from parameters? */
-  odom.pose.covariance[0] = 0.25;   ///< x 0.2
-  odom.pose.covariance[7] = 0.5;   ///< y 0.2
-  odom.pose.covariance[35] = 0.4;  ///< yaw 0.4
+  odom.pose.covariance[0] = 0.2;   ///< x 0.2
+  odom.pose.covariance[7] = 0.2;   ///< y 0.2
+  odom.pose.covariance[35] = 0.3;  ///< yaw 0.4
 
   // Velocity ("in the coordinate frame given by the child_frame_id")
   odom.twist.twist.linear.x = current_speed;

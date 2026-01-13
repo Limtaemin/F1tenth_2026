@@ -105,3 +105,10 @@ get_traj: obtain it from the notebook
 ---
 pf: ros2 launch particle_filter localize_launch.py
 run_pp: ros2 launch pure_pursuit pure_pursuit_launch.py
+
+===
+# Demo
+ros2 launch f1tenth_stack bringup_launch.py
+ros2 launch state_estimation ekf.launch.py
+ros2 launch particle_filter localize_launch.py
+ros2 launch pure_pursuit pure_pursuit_launch.py

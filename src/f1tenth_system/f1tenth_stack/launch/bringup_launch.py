@@ -197,7 +197,7 @@ def generate_launch_description():
     ld.add_action(urg_node)
     ld.add_action(ackermann_mux_node)
 
-    ld.add_action(ekf_node)
+    # ld.add_action(ekf_node)
     ld.add_action(static_baselink_to_laser)
     ld.add_action(static_baselink_to_imu)
 
