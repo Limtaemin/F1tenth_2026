@@ -15,8 +15,8 @@ pure_pursuit:
     max_lookahead: 3.0 # lookahead when the car is going around max velocity
     lookahead_ratio: 5.0 # approximately the max velocity
     # K_p: 0.25 # for square track
-    K_p: 0.20 # for big track
-    steering_limit: 15.0
+    K_p: 0.10 # for big track
+    steering_limit: 25.0 # in degrees
     velocity_percentage: 0.3 # the limit, can only do 1 lap with clean tires
 
 waypoint_visualizer_node:
