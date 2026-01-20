@@ -3,11 +3,12 @@
 ## Demo
 ```bash
 ros2 launch f1tenth_stack bringup_launch.py
-# ros2 launch state_estimation ekf.launch.py
 ros2 launch particle_filter localize_launch.py
 ros2 launch pure_pursuit pure_pursuit_launch.py
-ros2 launch stanley_avoidance stanley_avoidance_launch.py
 ```
+
+ros2 launch state_estimation ekf.launch.py
+ros2 launch stanley_avoidance stanley_avoidance_launch.py
 
 ===
 

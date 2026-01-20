@@ -169,7 +169,7 @@ void PurePursuit::get_waypoint() {
     double longest_distance = 0;
     int final_i = -1;
     int start = waypoints.index;
-    int end = (waypoints.index + 50) % num_waypoints;
+    int end = (waypoints.index + 100) % num_waypoints;
 
     // Lookahead needs to be between the min_lookhead and the max_lookahead
     double lookahead = std::min(std::max(min_lookahead, max_lookahead * curr_velocity / lookahead_ratio), max_lookahead);
@@ -237,30 +237,97 @@ void PurePursuit::quat_to_rot(double q0, double q1, double q2, double q3) {
     rotation_m << r00, r01, r02, r10, r11, r12, r20, r21, r22;
 }
 
-void PurePursuit::transformandinterp_waypoint() {  // pass old waypoint here
-    // initialise vectors
-    waypoints.lookahead_point_world << waypoints.X[waypoints.index], waypoints.Y[waypoints.index], 0.0;
-    waypoints.current_point_world << waypoints.X[waypoints.velocity_index], waypoints.Y[waypoints.velocity_index], 0.0;
+// void PurePursuit::transformandinterp_waypoint() {  // pass old waypoint here
+//     // initialise vectors
+//     waypoints.lookahead_point_world << waypoints.X[waypoints.index], waypoints.Y[waypoints.index], 0.0;
+//     waypoints.current_point_world << waypoints.X[waypoints.velocity_index], waypoints.Y[waypoints.velocity_index], 0.0;
+
+//     visualize_lookahead_point(waypoints.lookahead_point_world);
+//     visualize_current_point(waypoints.current_point_world);
+
+//     // look up transformation at that instant from tf_buffer_
+//     geometry_msgs::msg::TransformStamped transformStamped;
+
+//     try {
+//         // Get the transform from the base_link reference to world reference frame
+//         transformStamped = tf_buffer_->lookupTransform(car_refFrame, global_refFrame, tf2::TimePointZero);
+//     } catch (tf2::TransformException &ex) {
+//         RCLCPP_INFO(this->get_logger(), "Could not transform. Error: %s", ex.what());
+//     }
+
+//     // transform points (rotate first and then translate)
+//     Eigen::Vector3d translation_v(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
+//     quat_to_rot(transformStamped.transform.rotation.w, transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z);
+
+//     waypoints.lookahead_point_car = (rotation_m * waypoints.lookahead_point_world) + translation_v;
+// }
+
+void PurePursuit::transformandinterp_waypoint() {
+
+    // Build world-frame waypoint vectors
+    waypoints.lookahead_point_world << waypoints.X[waypoints.index],
+                                        waypoints.Y[waypoints.index], 0.0;
+
+    waypoints.current_point_world << waypoints.X[waypoints.velocity_index],
+                                      waypoints.Y[waypoints.velocity_index], 0.0;
 
     visualize_lookahead_point(waypoints.lookahead_point_world);
     visualize_current_point(waypoints.current_point_world);
 
-    // look up transformation at that instant from tf_buffer_
     geometry_msgs::msg::TransformStamped transformStamped;
-
     try {
-        // Get the transform from the base_link reference to world reference frame
-        transformStamped = tf_buffer_->lookupTransform(car_refFrame, global_refFrame, tf2::TimePointZero);
+        transformStamped = tf_buffer_->lookupTransform(car_refFrame,
+                                                       global_refFrame,
+                                                       tf2::TimePointZero);
     } catch (tf2::TransformException &ex) {
-        RCLCPP_INFO(this->get_logger(), "Could not transform. Error: %s", ex.what());
+        RCLCPP_INFO(this->get_logger(), "Transform error: %s", ex.what());
+        return;
     }
 
-    // transform points (rotate first and then translate)
-    Eigen::Vector3d translation_v(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
-    quat_to_rot(transformStamped.transform.rotation.w, transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z);
+    // Build rotation and translation
+    Eigen::Vector3d translation_v(transformStamped.transform.translation.x,
+                                  transformStamped.transform.translation.y,
+                                  transformStamped.transform.translation.z);
 
-    waypoints.lookahead_point_car = (rotation_m * waypoints.lookahead_point_world) + translation_v;
+    quat_to_rot(transformStamped.transform.rotation.w,
+                transformStamped.transform.rotation.x,
+                transformStamped.transform.rotation.y,
+                transformStamped.transform.rotation.z);
+
+    // ---- Transform initial lookahead into car frame ----
+    waypoints.lookahead_point_car =
+        (rotation_m * waypoints.lookahead_point_world) + translation_v;
+
+    // ====================================================
+    // Forward-half-plane enforcement (the actual fix)
+    // ====================================================
+
+    if (waypoints.lookahead_point_car(0) <= 0.0) {
+
+        // Search forward through waypoints until one lies in front
+        int i = waypoints.index;
+        for (int k = 0; k < num_waypoints; k++) {
+
+            i = (i + 1) % num_waypoints;  // move forward along raceline
+
+            Eigen::Vector3d candidate_world;
+            candidate_world << waypoints.X[i], waypoints.Y[i], 0.0;
+
+            Eigen::Vector3d candidate_car =
+                (rotation_m * candidate_world) + translation_v;
+
+            if (candidate_car(0) > 0.0) {
+                waypoints.index = i;
+                waypoints.lookahead_point_world = candidate_world;
+                waypoints.lookahead_point_car = candidate_car;
+                break;
+            }
+        }
+    }
+
+    // ====================================================
 }
+
 
 // spp: new addition here
 // void PurePursuit::transformandinterp_waypoint() {
