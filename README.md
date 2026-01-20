@@ -1,45 +1,74 @@
-# f1tenth
+# F1tenth
+
+## Demo
+```bash
+ros2 launch f1tenth_stack bringup_launch.py
+ros2 launch state_estimation ekf.launch.py
+ros2 launch particle_filter localize_launch.py
+ros2 launch pure_pursuit pure_pursuit_launch.py
+```
+
+===
+
+## Build
 F1Tenth Race Stack for Autonomous Navigation
 
+```bash
 colcon build --symlink-install # for editic src config directly
+```
 
-
+Key teleoperation
+```bash
 python ./key_teleop.py
+```
 
-## Lidar Odom (need to check it's working)
+## Lidar Odometry (need to check it's working)
 ros2 launch rf2o_laser_odometry rf2o_laser_odometry.launch.py 
 
 
 ## Foxglove Viz
+
+```bash
 ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+```
 
 For foxglove_bridge: need to source galactic: source /opt/ros/galactic/setup.bash
+```bash
 ros2 run foxglove_bridge foxglove_bridge
+```
 
+## Connect bt: 
 
-connect bt: connect_joy on terminal
+```bash
+connect_joy
+```
 
 ## Bringup
-bringup: ros2 launch f1tenth_stack bringup_launch.py
-
+```bash
+ros2 launch f1tenth_stack bringup_launch.py
+```
 
 No Machine:
 Check Status: sudo /usr/NX/bin/nxserver --status
 Start: sudo /usr/NX/bin/nxserver --startup
 
-# Jetson Clock
-sudo /usr/bin/jetson_clocks
+## Jetson Clock
 
-# SLAM
+```bash
+sudo /usr/bin/jetson_clocks
+```
+===
+
+## SLAM
 ros2 launch slam_toolbox online_async_launch.py params_file:=/home/rlspeed/race_stack/f1tenth/src/f1tenth_system/f1tenth_stack/config/f1tenth_online_async.yaml
 
 
 
-## save map
+### save map
 ros2 service call /slam_toolbox/save_map slam_toolbox/srv/SaveMap "{name: {data: '/home/rlspeed/race_stack/f1tenth/arc'}}"
 
 
-## save posegraph
+### save posegraph
 ros2 service call /slam_toolbox/serialize_map slam_toolbox/srv/SerializePoseGraph "{filename: '/home/rlspeed/race_stack/f1tenth/hesl'}"
 
 Deserialize pose
@@ -47,8 +76,9 @@ ros2 service call /slam_toolbox/deserialize_map slam_toolbox/srv/DeserializePose
 save map
 ros2 service call /slam_toolbox/save_map slam_toolbox/srv/SaveMap "{name: {data: '/home/rlspeed/race_stack/f1tenth/hesl'}}"
 
+===
 
-# Intelisense Camera IMU
+## Intelisense Camera IMU
 ros2 launch realsense2_camera rs_launch.py \
     enable_infra1:=false \
     enable_infra2:=false \
@@ -64,51 +94,44 @@ It gives topic:
 tf: camera_link → camera_imu_frame
 Need to create tf_static base_link -> camera_link
 
+===
 
-# Particle Filter 2017
+## Particle Filter 2017
 
 ros2 launch particle_filter localize_launch.py
 rviz map: the map does not show up automatically, change the durability policy to transient (Map -> Topic -> Durability Policy). This is because the map is running on server.
 
 
-# Cartographer
+===
+
+## Cartographer
 ros2 launch cartographer cartographer.launch.py
 
-## save map
+### save map
 ros2 run nav2_map_server map_saver_cli -f ~/race_stack/f1tenth/test
 
-
-
-# loacalixation
+### Loacalixation
 ros2 service call /map_server/load_map nav2_msgs/srv/LoadMap "{map_url: /home/rlspeed/race_stack/f1tenth/hesl.yaml}"
 or?
 ros2 service call /map_server/load_map nav2_msgs/srv/LoadMap \
 "{map_url: '/home/rlspeed/race_stack/f1tenth/hesl.yaml'}"
 
 
+===
 
-
-# EKF (odm - imu fusion)
+## EKF (odm - imu fusion)
 ros2 launch state_estimation ekf.launch.py
 
 =======
 # Final
-bringup: ros2 launch f1tenth_stack bringup_launch.py
-ekf: ros2 launch state_estimation ekf.launch.py
-
-slam: ros2 launch slam_toolbox online_async_launch.py params_file:=/home/rlspeed/race_stack/f1tenth/src/f1tenth_system/f1tenth_stack/config/f1tenth_online_async.yaml
-save_map: ros2 run nav2_map_server map_saver_cli -f ~/race_stack/f1tenth/test
-
+1. bringup: ros2 launch f1tenth_stack bringup_launch.py
+2. ekf: ros2 launch state_estimation ekf.launch.py
+3. slam: ros2 launch slam_toolbox online_async_launch.py params_file:=/home/rlspeed/race_stack/f1tenth/src/f1tenth_system/f1tenth_stack/config/f1tenth_online_async.yaml
+4. save_map: ros2 run nav2_map_server map_saver_cli -f ~/race_stack/f1tenth/test
 
 ---
-get_traj: obtain it from the notebook
+5. get_traj: obtain it from the notebook
 ---
-pf: ros2 launch particle_filter localize_launch.py
-run_pp: ros2 launch pure_pursuit pure_pursuit_launch.py
-
+6. pf: ros2 launch particle_filter localize_launch.py
+7. run_pp: ros2 launch pure_pursuit pure_pursuit_launch.py
 ===
-# Demo
-ros2 launch f1tenth_stack bringup_launch.py
-ros2 launch state_estimation ekf.launch.py
-ros2 launch particle_filter localize_launch.py
-ros2 launch pure_pursuit pure_pursuit_launch.py
