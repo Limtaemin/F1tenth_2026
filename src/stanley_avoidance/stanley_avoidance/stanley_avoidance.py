@@ -36,7 +36,6 @@ class StanleyAvoidance(Node):
         super().__init__("stanley_avoidance_node")
 
         self.declare_parameter("waypoints_path", "/home/rlspeed/race_stack/f1tenth/src/stanley_avoidance/racelines/arc.csv")
-        self.declare_parameter("waypoints_path_2nd", "/home/rlspeed/race_stack/f1tenth/src/stanley_avoidance/racelines/arc.csv")
         self.declare_parameter("scan_topic", "/scan")
         self.declare_parameter("odom_topic", "/odom")
         self.declare_parameter("drive_topic", "/drive")
@@ -62,10 +61,7 @@ class StanleyAvoidance(Node):
         self.declare_parameter("steering_limit", 20.0)
         self.declare_parameter("cells_per_meter", 10)
 
-        self.declare_parameter("lane_number", 1)
-
         self.waypoints_world_path = str(self.get_parameter("waypoints_path").value)
-        self.waypoints_world_path_2nd = str(self.get_parameter("waypoints_path_2nd").value)
         self.scan_topic = str(self.get_parameter("scan_topic").value)
         self.odom_topic = str(self.get_parameter("odom_topic").value)
         self.drive_topic = str(self.get_parameter("drive_topic").value)
@@ -86,7 +82,6 @@ class StanleyAvoidance(Node):
         self.velocity_percentage = float(self.get_parameter("velocity_percentage").value)
         self.steering_limit = float(self.get_parameter("steering_limit").value)
         self.CELLS_PER_METER = int(self.get_parameter("cells_per_meter").value)
-        self.lane_number = int(self.get_parameter("lane_number").value)  # Dynamically change lanes
 
         min_lookahead = float(self.get_parameter("min_lookahead").value)
         max_lookahead = float(self.get_parameter("max_lookahead").value)
@@ -103,7 +98,6 @@ class StanleyAvoidance(Node):
             max_lookahead=max_lookahead,
             min_lookahead_speed=min_lookahead_speed,
             max_lookahead_speed=max_lookahead_speed,
-            filepath_2nd=self.waypoints_world_path_2nd,
         )
 
         self.get_logger().info(f"Loaded {len(self.waypoint_utils.waypoints_world)} waypoints")
@@ -160,8 +154,6 @@ class StanleyAvoidance(Node):
         self.waypoint_utils.max_lookahead = float(self.get_parameter("max_lookahead").value)
         self.waypoint_utils.min_lookahead_speed = float(self.get_parameter("min_lookahead_speed").value)
         self.waypoint_utils.max_lookahead_speed = float(self.get_parameter("max_lookahead_speed").value)
-
-        self.waypoint_utils.lane_number = int(self.get_parameter("lane_number").value)  # Dynamically change lanes
 
     def local_to_grid(self, x, y):
         i = int(x * -self.CELLS_PER_METER + (self.grid_height - 1))
@@ -718,8 +710,6 @@ class WaypointUtils:
         max_lookahead=3.0,
         min_lookahead_speed=3.0,
         max_lookahead_speed=6.0,
-        filepath_2nd="/f1tenth_ws/racelines/e7_floor5.csv",
-        lane_number=0,
     ):
 
         self.node = node
@@ -731,12 +721,6 @@ class WaypointUtils:
 
         self.waypoints_world, self.velocities = self.load_and_interpolate_waypoints(
             file_path=filepath, interpolation_distance=interpolation_distance
-        )
-
-        # For competition, where I want to customize the lanes that I am using
-        self.lane_number = lane_number
-        self.waypoints_world_2nd, self.velocities_2nd = self.load_and_interpolate_waypoints(
-            file_path=filepath_2nd, interpolation_distance=interpolation_distance
         )
 
         self.index = 0
@@ -804,10 +788,7 @@ class WaypointUtils:
         position = (pose.position.x, pose.position.y, 0)
 
         # transform way-points from world to vehicle frame of reference
-        if self.lane_number == 0:
-            waypoints_car = self.transform_waypoints(self.waypoints_world, position, pose)
-        else:
-            waypoints_car = self.transform_waypoints(self.waypoints_world_2nd, position, pose)
+        waypoints_car = self.transform_waypoints(self.waypoints_world, position, pose)
 
         # get distance from car to all waypoints
         distances = np.linalg.norm(waypoints_car, axis=1)
@@ -815,10 +796,7 @@ class WaypointUtils:
         # get indices of waypoints sorted by ascending distance
         self.velocity_index = np.argmin(distances)
 
-        if self.lane_number == 0:
-            return self.waypoints_world[self.velocity_index], self.velocities[self.velocity_index]
-        else:
-            return self.waypoints_world_2nd[self.velocity_index], self.velocities_2nd[self.velocity_index]
+        return self.waypoints_world[self.velocity_index], self.velocities[self.velocity_index]
 
     def get_waypoint_stanley(self, pose):
         # get current position of car
@@ -827,10 +805,7 @@ class WaypointUtils:
         position = (pose.position.x, pose.position.y, 0)
 
         # transform way-points from world to vehicle frame of reference
-        if self.lane_number == 0:
-            waypoints_car = self.transform_waypoints(self.waypoints_world, position, pose)
-        else:
-            waypoints_car = self.transform_waypoints(self.waypoints_world_2nd, position, pose)
+        waypoints_car = self.transform_waypoints(self.waypoints_world, position, pose)
 
         # get distance from car to all waypoints
         distances = np.linalg.norm(waypoints_car, axis=1)
@@ -838,10 +813,7 @@ class WaypointUtils:
         # get indices of waypoints sorted by ascending distance
         index = np.argmin(distances)
 
-        if self.lane_number == 0:
-            return waypoints_car[index], self.waypoints_world[index]
-        else:
-            return waypoints_car[index], self.waypoints_world_2nd[index]
+        return waypoints_car[index], self.waypoints_world[index]
 
     def get_waypoint(self, pose, target_velocity, fixed_lookahead=None):
         # get current position of car
@@ -850,10 +822,7 @@ class WaypointUtils:
         position = (pose.position.x, pose.position.y, 0)
 
         # transform way-points from world to vehicle frame of reference
-        if self.lane_number == 0:
-            waypoints_car = self.transform_waypoints(self.waypoints_world, position, pose)
-        else:
-            waypoints_car = self.transform_waypoints(self.waypoints_world_2nd, position, pose)
+        waypoints_car = self.transform_waypoints(self.waypoints_world, position, pose)
 
         # get distance from car to all waypoints
         distances = np.linalg.norm(waypoints_car, axis=1)
@@ -884,10 +853,7 @@ class WaypointUtils:
             x = waypoints_car[i][0]
             if x > 0:
                 self.index = i
-                if self.lane_number == 0:
-                    return waypoints_car[self.index], self.waypoints_world[self.index]
-                else:
-                    return waypoints_car[self.index], self.waypoints_world_2nd[self.index]
+                return waypoints_car[self.index], self.waypoints_world[self.index]
         return None, None
 
 

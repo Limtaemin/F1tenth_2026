@@ -1,14 +1,11 @@
 rrt:
   ros__parameters:
     waypoints_path: "/home/rlspeed/race_stack/f1tenth/src/stanley_avoidance/racelines/arc.csv"
-    waypoints_path_2nd: "/home/rlspeed/race_stack/f1tenth/src/stanley_avoidance/racelines/arc.csv"
     scan_topic: "/scan"
     odom_topic: "/pf/pose/odom"
     drive_topic: "/drive"
     interpolation_distance: 0.05
     velocity_percentage: 0.3
-
-    lane_number: 0
 
     K_p: 0.5
     K_p_obstacle: 0.8
