@@ -54,7 +54,7 @@ class StanleyAvoidance(Node):
         self.declare_parameter("max_lookahead", 3.0)
         self.declare_parameter("min_lookahead_speed", 1.0)
         self.declare_parameter("max_lookahead_speed", 3.0)
-        self.declare_parameter("interpolation_distance", 0.5)
+        self.declare_parameter("interpolation_distance", 0.1)
         self.declare_parameter("velocity_min", 1.0)
         self.declare_parameter("velocity_max", 3.0)
         self.declare_parameter("velocity_percentage", 0.5)

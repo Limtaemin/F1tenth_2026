@@ -7,6 +7,10 @@ ros2 launch particle_filter localize_launch.py
 ros2 launch pure_pursuit pure_pursuit_launch.py
 ```
 
+```bash
+ros2 run safety_node safety_node.py
+```
+
 ros2 launch state_estimation ekf.launch.py
 ros2 launch stanley_avoidance stanley_avoidance_launch.py
 
