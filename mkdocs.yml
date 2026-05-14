@@ -1,0 +1,42 @@
+site_name: F1TENTH 한국어 실험 문서
+site_description: F1TENTH ROS2 race stack 한국어 실험 문서
+site_author: limtaemin
+site_url: https://limtaemin.github.io/F1tenth_2026/
+
+repo_name: Limtaemin/F1tenth_2026
+repo_url: https://github.com/Limtaemin/F1tenth_2026
+
+theme:
+  name: material
+  language: ko
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - 홈: index.md
+  - 전체 개요: 00_전체_개요.md
+  - 설치와 빌드: 01_설치_빌드.md
+  - 수동조작과 웹조작: 02_수동조작_웹조작.md
+  - SLAM 맵 생성: 03_SLAM_맵생성.md
+  - 위치추정 Particle Filter: 04_위치추정_particle_filter.md
+  - Pure Pursuit 경로추종: 05_경로추종_pure_pursuit.md
+  - Stanley 장애물 회피: 06_장애물회피_stanley_avoidance.md
+  - config 설명: 07_config_설명.md
+  - 문제해결: 08_문제해결.md
+  - 실행 묶음과 주행 모드: 09_실행묶음_주행모드.md
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.inlinehilite
