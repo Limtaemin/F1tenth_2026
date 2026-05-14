@@ -11,12 +11,32 @@ theme:
   language: ko
   features:
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
+    - navigation.expand
     - navigation.top
+    - navigation.footer
     - toc.integrate
     - search.suggest
     - search.highlight
     - content.code.copy
+    - content.tabs.link
+  palette:
+    - scheme: default
+      primary: black
+      accent: grey
+      toggle:
+        icon: material/weather-night
+        name: 다크 모드로 전환
+    - scheme: slate
+      primary: black
+      accent: grey
+      toggle:
+        icon: material/weather-sunny
+        name: 라이트 모드로 전환
+
+extra_css:
+  - stylesheets/extra.css
 
 nav:
   - 홈: index.md
@@ -33,10 +53,18 @@ nav:
 
 markdown_extensions:
   - admonition
+  - attr_list
+  - md_in_html
   - tables
   - toc:
       permalink: true
-  - pymdownx.highlight
+  - pymdownx.highlight:
+      anchor_linenums: true
   - pymdownx.superfences
   - pymdownx.details
   - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra:
+  generator: false
