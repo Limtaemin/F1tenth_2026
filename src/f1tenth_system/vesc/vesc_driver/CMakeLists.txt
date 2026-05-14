@@ -14,6 +14,7 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 find_package(Threads)
+find_package(serial_driver REQUIRED)
 
 ###########
 ## Build ##
@@ -26,9 +27,15 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/vesc_packet.cpp
   src/vesc_packet_factory.cpp
 )
+
+ament_target_dependencies(${PROJECT_NAME}
+  serial_driver
+)
+
 target_link_libraries(${PROJECT_NAME}
   ${CMAKE_THREAD_LIBS_INIT}
 )
+
 rclcpp_components_register_node(${PROJECT_NAME}
   PLUGIN vesc_driver::VescDriver
   EXECUTABLE ${PROJECT_NAME}_node
