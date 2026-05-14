@@ -519,6 +519,7 @@ f1tenth/
 | 7 | [docs/06_장애물회피_stanley_avoidance.md](docs/06_장애물회피_stanley_avoidance.md) | Stanley 장애물 회피 |
 | 8 | [docs/07_config_설명.md](docs/07_config_설명.md) | config YAML 역할 |
 | 9 | [docs/08_문제해결.md](docs/08_문제해결.md) | 자주 발생하는 문제 해결 |
+| 10 | [docs/09_실행묶음_주행모드.md](docs/09_실행묶음_주행모드.md) | SLAM, Pure Pursuit, Stanley 실행 묶음과 주행 모드 |
 
 ---
 
