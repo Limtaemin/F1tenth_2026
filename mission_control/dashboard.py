@@ -93,12 +93,15 @@ speed = 0.0
 steer = 0.0
 
 MAX_SPEED = 1.0
+SPEED_STEP = 0.2
 STEER_MAG = 0.25
+STEER_STEP = 0.03
 
 HZ = 20.0
 
 # 기본값: 수동 모드
 autonomous_mode = False
+return_to_center = False
 
 
 # ===============================
@@ -484,22 +487,26 @@ def set_limits():
 
 @app.route("/cmd", methods=["POST"])
 def cmd():
-    global speed, steer
+    global speed, steer, return_to_center
 
     c = request.get_json()["cmd"]
 
     with lock:
         if c == "up":
-            speed += MAX_SPEED
+            return_to_center = False
+            speed += SPEED_STEP
         elif c == "down":
-            speed -= MAX_SPEED
+            return_to_center = False
+            speed -= SPEED_STEP
         elif c == "left":
-            steer += STEER_MAG
+            return_to_center = False
+            steer -= STEER_STEP
         elif c == "right":
-            steer -= STEER_MAG
+            return_to_center = False
+            steer += STEER_STEP
         elif c == "stop":
             speed = 0.0
-            steer = 0.0
+            return_to_center = True
 
         speed = max(-MAX_SPEED, min(MAX_SPEED, speed))
         steer = max(-STEER_MAG, min(STEER_MAG, steer))
@@ -511,17 +518,17 @@ def cmd():
 
 @app.route("/mode/manual")
 def mode_manual():
-    global autonomous_mode
+    global autonomous_mode, steer, return_to_center
 
     with lock:
         autonomous_mode = False
+return_to_center = False
 
-    return ("", 204)
 
 
 @app.route("/mode/auto")
 def mode_auto():
-    global autonomous_mode
+    global autonomous_mode, steer, return_to_center
 
     with lock:
         autonomous_mode = True
@@ -546,11 +553,20 @@ class DrivePublisher(Node):
         self.create_timer(1.0 / HZ, self.on_timer)
 
     def on_timer(self):
-        global autonomous_mode
+        global autonomous_mode, steer, return_to_center
 
         with lock:
             if autonomous_mode:
                 return
+
+            if return_to_center:
+                if steer > STEER_STEP:
+                    steer += STEER_STEP
+                elif steer < -STEER_STEP:
+                    steer -= STEER_STEP
+                else:
+                    steer = 0.0
+                    return_to_center = False
 
             v = float(speed)
             s = float(steer)
