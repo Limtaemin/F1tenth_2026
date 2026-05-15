@@ -492,29 +492,28 @@ def cmd():
     c = request.get_json()["cmd"]
 
     with lock:
+        return_to_center = False
+
         if c == "up":
-            return_to_center = False
             speed += SPEED_STEP
         elif c == "down":
-            return_to_center = False
             speed -= SPEED_STEP
+
+        # 웹 조향 방향 반전 유지
         elif c == "left":
-            return_to_center = False
             steer -= STEER_STEP
         elif c == "right":
-            return_to_center = False
             steer += STEER_STEP
+
+        # 원래 방식: 정지 누르면 속도/조향 즉시 0
         elif c == "stop":
             speed = 0.0
-            return_to_center = True
+            steer = 0.0
 
         speed = max(-MAX_SPEED, min(MAX_SPEED, speed))
         steer = max(-STEER_MAG, min(STEER_MAG, steer))
 
     return ("", 204)
-
-
-# ---------- mode endpoints ----------
 
 @app.route("/mode/manual")
 def mode_manual():
