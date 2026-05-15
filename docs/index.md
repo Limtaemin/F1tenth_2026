@@ -45,35 +45,34 @@
 ```bash
 bash scripts/02_bringup.sh
 bash scripts/03_web_dashboard.sh
-```
-
-### SLAM 맵 생성
-
-```bash
+SLAM 맵 생성
 bash scripts/02_bringup.sh
 bash scripts/04_rviz.sh
 bash scripts/05_slam_start.sh
 bash scripts/03_web_dashboard.sh
-```
-
-### Pure Pursuit 주행
-
-```bash
+Pure Pursuit 주행
 bash scripts/02_bringup.sh
 bash scripts/04_rviz.sh
 bash scripts/07_localization.sh
 bash scripts/08_pure_pursuit.sh
-```
-
-### Stanley Avoidance 주행
-
-```bash
+Stanley Avoidance 주행
 bash scripts/02_bringup.sh
 bash scripts/04_rviz.sh
 bash scripts/07_localization.sh
 bash scripts/09_stanley_avoidance.sh
-```
 
-## 관련 링크
+주의할 점은 실제 파일에 넣을 때도 코드블록 시작/끝이 이렇게 따로 있어야 해.
 
-- [GitHub 저장소](https://github.com/Limtaemin/f1tenth)
+---
+
+## 2. GitHub로 바로 가는 상단 링크 추가
+
+`mkdocs.yml`에서 `nav:` 부분에 GitHub 링크를 추가하면 돼.
+
+```yaml
+nav:
+  - Home: index.md
+  - 시작하기: getting-started.md
+  - 사용법: usage.md
+  - GitHub: https://github.com/Limtaemin/f1tenth_2026
+  
