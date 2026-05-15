@@ -51,6 +51,7 @@ nav:
   - 문제해결: 08_문제해결.md
   - 실행 묶음과 주행 모드: 09_실행묶음_주행모드.md
 
+  - GitHub: https://github.com/Limtaemin/f1tenth
 markdown_extensions:
   - admonition
   - attr_list
