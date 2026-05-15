@@ -40,39 +40,57 @@
 
 ## 빠른 실행 예시
 
-### 웹 수동조작
+### 1. 처음 빌드
+
+```bash
+bash scripts/01_build.sh
+source install/setup.bash
+```
+
+### 2. 웹 수동조작
 
 ```bash
 bash scripts/02_bringup.sh
 bash scripts/03_web_dashboard.sh
-SLAM 맵 생성
+```
+
+### 3. SLAM 맵 생성
+
+```bash
 bash scripts/02_bringup.sh
 bash scripts/04_rviz.sh
 bash scripts/05_slam_start.sh
 bash scripts/03_web_dashboard.sh
-Pure Pursuit 주행
+```
+
+맵 저장은 별도 터미널에서 실행합니다.
+
+```bash
+bash scripts/06_save_map.sh maps/saved/my_map
+```
+
+### 4. 위치추정
+
+```bash
+bash scripts/02_bringup.sh
+bash scripts/04_rviz.sh
+bash scripts/07_localization.sh
+```
+
+### 5. Pure Pursuit 주행
+
+```bash
 bash scripts/02_bringup.sh
 bash scripts/04_rviz.sh
 bash scripts/07_localization.sh
 bash scripts/08_pure_pursuit.sh
-Stanley Avoidance 주행
+```
+
+### 6. Stanley Avoidance 주행
+
+```bash
 bash scripts/02_bringup.sh
 bash scripts/04_rviz.sh
 bash scripts/07_localization.sh
 bash scripts/09_stanley_avoidance.sh
-
-주의할 점은 실제 파일에 넣을 때도 코드블록 시작/끝이 이렇게 따로 있어야 해.
-
----
-
-## 2. GitHub로 바로 가는 상단 링크 추가
-
-`mkdocs.yml`에서 `nav:` 부분에 GitHub 링크를 추가하면 돼.
-
-```yaml
-nav:
-  - Home: index.md
-  - 시작하기: getting-started.md
-  - 사용법: usage.md
-  - GitHub: https://github.com/Limtaemin/f1tenth_2026
-  
+```
